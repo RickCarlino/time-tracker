@@ -1,12 +1,12 @@
 mainControllerFn = ($scope, $timeout, database) ->
   $scope.db = database
   $scope.search =
-    include_docs: true
     descending: true
-    limit: 15
-    skip: 0
-    page: 0
-    total_pages: 0 #This is for our use.
+    # include_docs: true
+    # limit: 15
+    # skip: 0
+    # page: 0
+    # total_pages: 0 #This is for our use.
 
   $scope.input =
     text: ""
@@ -38,11 +38,16 @@ mainControllerFn = ($scope, $timeout, database) ->
       $timeout.cancel $scope.reminder  unless not $scope.reminder
       $scope.reminder = $timeout($scope.remind, $scope.input.every * 60000)
 
+  $scope.update = (_new, old, $scope) ->
+    if _new.descending != old.descending # Check for sort change
+      database.storage = database.storage.reverse()
+
+
   $scope.remind = ->
     $scope.input.text = prompt("Hey- it looks like you havent checked in for a while. Mind telling me what you're doing?")
     $scope.createLog()
     $scope.setReminder()
-
+  $scope.$watch 'search', $scope.update, true
   $scope.setReminder()
   $scope.sync()
 
